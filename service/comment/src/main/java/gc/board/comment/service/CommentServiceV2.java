@@ -42,6 +42,42 @@ public class CommentServiceV2 {
         return CommentResponse.from(comment);
     }
 
+    public CommentResponse read(Long commentId) {
+        return CommentResponse.from(
+                commentRepository.findById(commentId).orElseThrow()
+        );
+    }
+
+    @Transactional
+    public void delete(Long commentId) {
+        commentRepository.findById(commentId)
+                .filter(not(CommentV2::getDeleted))
+        .ifPresent(comment->{
+            if(hasChildren(comment)){
+                comment.delete();
+            }else{
+                delete(comment);
+            }
+        });
+    }
+
+    private boolean hasChildren(CommentV2 comment) {
+        return commentRepository.findDescendantsTopPath(
+                comment.getArticleId(),
+                comment.getCommentPath().getPath()
+        ).isPresent();
+    }
+
+    private void delete(CommentV2 comment) {
+        commentRepository.delete(comment);
+        if(!comment.isRoot()){
+            commentRepository.findByPath(comment.getCommentPath().getParentPath())
+                    .filter(CommentV2::getDeleted)
+                    .filter(not(this::hasChildren))
+                    .ifPresent(this::delete);
+        }
+    }
+
     private CommentV2 getCommentResponse(CommentCreateRequestV2 request) {
         String parentPath= request.getParentPath();
         if(parentPath==null){
