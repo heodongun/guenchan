@@ -31,4 +31,22 @@ class CommentPathTest {
         CommentPath childCommentPath = commentPath.createChildCommentPath(decendantsTopPath);
         Assertions.assertThat(childCommentPath.getPath()).isEqualTo(expectedChildPath);
     }
+
+    @Test
+    void createChildCommentPathIfMaxDepthTest(){
+        Assertions.assertThatThrownBy(()->{
+            CommentPath.create("zzzzz".repeat(5)).createChildCommentPath(null);
+        }).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void createChildCommentPathIfChunkOverflowTest(){
+        //given
+        CommentPath commentPath = CommentPath.create("");
+
+        //when, then
+        Assertions.assertThatThrownBy(()->{
+            commentPath.createChildCommentPath("zzzzz".repeat(5));
+        }).isInstanceOf(IllegalArgumentException.class);
+    }
 }
