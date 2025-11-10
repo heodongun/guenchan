@@ -27,4 +27,26 @@ public class CommentV2 {
     private CommentPath commentPath;
     private Boolean deleted;
     private LocalDateTime createdAt;
+
+    public static CommentV2 create(
+            Long commentId, String content, Long articleId, Long writerId, CommentPath commentPath
+    ) {
+        CommentV2 commentV2 = new CommentV2();
+        commentV2.commentId = commentId;
+        commentV2.content = content;
+        commentV2.articleId = articleId;
+        commentV2.writerId = writerId;
+        commentV2.commentPath = commentPath;
+        commentV2.deleted = false;
+        commentV2.createdAt = LocalDateTime.now();
+        return commentV2;
+    }
+
+    public boolean isRoot() {
+        return commentPath.isRoot();
+    }
+
+    public void delete() {
+        this.deleted = true;
+    }
 }
