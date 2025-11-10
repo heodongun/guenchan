@@ -22,6 +22,5 @@ public interface CommentRepositoryV2 extends CrudRepository<CommentV2, Long> {
     Optional<String> findDescendantsTopPath(
             @Param("articleId") Long articleId,
             @Param("pathPrefix") String pathPrefix
-
-    )
+    );
 }
